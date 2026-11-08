@@ -1,8 +1,54 @@
-const reloadButton = document.querySelector('#reload');
-const frames = document.querySelectorAll('iframe');
-
-reloadButton.addEventListener('click', () => {
-  for (const frame of frames) {
-    frame.contentWindow.location.reload();
+class FireplacePreview {
+  constructor() {
+    this.frames = [...document.querySelectorAll('iframe')];
+    this.reloadButton = document.querySelector('#reload');
+    this.readyFrames = new Set();
   }
-});
+
+  init() {
+    window.addEventListener('message', (event) => this.handleMessage(event));
+    this.reloadButton.addEventListener('click', () => this.reload());
+
+    // A cached iframe may have reported readiness before this script loaded.
+    for (const frame of this.frames) {
+      frame.contentWindow.postMessage({ type: 'fireplace:check-ready' }, window.location.origin);
+    }
+  }
+
+  handleMessage(event) {
+    if (event.origin !== window.location.origin || event.data?.type !== 'fireplace:ready') return;
+
+    const knownFrame = this.frames.some((frame) => frame.contentWindow === event.source);
+
+    if (!knownFrame || this.readyFrames.has(event.source)) return;
+
+    this.readyFrames.add(event.source);
+
+    if (this.readyFrames.size === this.frames.length) {
+      this.start();
+    }
+  }
+
+  start() {
+    const message = {
+      type: 'fireplace:start',
+      startAt: Date.now() + 100,
+    };
+
+    for (const frame of this.frames) {
+      frame.contentWindow.postMessage(message, window.location.origin);
+    }
+  }
+
+  reload() {
+    this.readyFrames.clear();
+
+    for (const frame of this.frames) {
+      frame.contentWindow.location.reload();
+    }
+  }
+}
+
+const preview = new FireplacePreview();
+
+preview.init();

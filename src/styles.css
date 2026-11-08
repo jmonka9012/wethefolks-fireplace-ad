@@ -48,11 +48,14 @@ body {
 }
 .creative__background {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: var(--background-x);
+  width: 1680px;
+  height: 975px;
   background-image: url("../assets/bg-big.jpg");
   background-repeat: no-repeat;
   background-size: 1680px 975px;
-  background-position: var(--background-x) 0;
+  transform-origin: center;
 }
 .creative:focus-visible {
   outline: 3px solid white;

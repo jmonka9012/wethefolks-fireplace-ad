@@ -57,11 +57,15 @@ body {
 
   &__background {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: var(--background-x);
+    width: $background-width;
+    height: $side-height;
     background-image: url('../assets/bg-big.jpg');
     background-repeat: no-repeat;
     background-size: $background-width $side-height;
-    background-position: var(--background-x) 0;
+    // Every banner clips the same surface, including its center of scaling.
+    transform-origin: center;
   }
 
   &:focus-visible {
