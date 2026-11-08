@@ -1,0 +1,15 @@
+{
+  "name": "wethefolks-fireplace-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 5173 --bind 127.0.0.1",
+    "build:css": "sass --no-source-map src/styles.scss src/styles.css",
+    "watch:css": "sass --watch --no-source-map src/styles.scss:src/styles.css",
+    "check": "node --check src/preview.js && npm run build:css"
+  },
+  "devDependencies": {
+    "sass": "1.104.1"
+  }
+}

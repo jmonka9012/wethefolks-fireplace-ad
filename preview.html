@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fireplace — preview</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="src/preview.js" defer></script>
+  </head>
+  <body class="preview">
+    <header class="preview__toolbar">
+      <h1 class="preview__title">Fireplace preview</h1>
+      <button class="preview__reload" id="reload" type="button">Reload ads</button>
+    </header>
+    <main class="preview__viewport" aria-label="Ad preview">
+      <div class="fireplace">
+        <iframe class="fireplace__frame fireplace__frame--top" src="top.html" title="Top ad" width="1032" height="250"></iframe>
+        <iframe class="fireplace__frame fireplace__frame--left" src="left.html" title="Left ad" width="320" height="975"></iframe>
+        <div class="fireplace__publisher" aria-label="Publisher content area"></div>
+        <iframe class="fireplace__frame fireplace__frame--right" src="right.html" title="Right ad" width="320" height="975"></iframe>
+      </div>
+    </main>
+  </body>
+</html>
