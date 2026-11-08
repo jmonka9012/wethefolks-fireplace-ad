@@ -1,4 +1,4 @@
-.creative .asset:not(.creative__headline, .creative__logo) {
+.creative .creative__cta {
   visibility: hidden;
 }
 

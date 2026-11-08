@@ -7,8 +7,19 @@ const backgroundZoom = {
 const logoEntrance = {
   leftDelay: 1200,
   rightDelay: 1500,
-  duration: 1000,
+  duration: 1300,
   startScale: 0.5,
+  easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+};
+
+const panelEntrance = {
+  delayAfterLogoStart: 400,
+  duration: 700,
+};
+
+const copyEntrance = {
+  delayAfterPanel: 200,
+  duration: 1400,
   easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
@@ -17,6 +28,8 @@ class CreativeAnimations {
     this.creative = creative;
     this.background = creative.querySelector('.creative__background');
     this.logo = creative.querySelector('.creative__logo');
+    this.panel = creative.querySelector('.creative__panel');
+    this.copy = creative.querySelector('.creative__copy');
     this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     this.syncedPreview = window.parent !== window
       && new URLSearchParams(window.location.search).get('sync') === '1';
@@ -28,6 +41,8 @@ class CreativeAnimations {
     this.updateMotionPreference();
     this.prepareBackgroundZoom();
     this.prepareLogoEntrance();
+    this.preparePanelEntrance();
+    this.prepareCopyEntrance();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -43,6 +58,18 @@ class CreativeAnimations {
       // Wait for the background and other images before starting the intro.
       window.addEventListener('load', () => this.markReady(), { once: true });
     }
+  }
+
+  get logoDelay() {
+    return this.creative.classList.contains('creative--right')
+      ? logoEntrance.rightDelay
+      : logoEntrance.leftDelay;
+  }
+
+  get panelDelay() {
+    const lastLogoStart = Math.max(logoEntrance.leftDelay, logoEntrance.rightDelay);
+
+    return lastLogoStart + panelEntrance.delayAfterLogoStart;
   }
 
   prepareBackgroundZoom() {
@@ -71,9 +98,46 @@ class CreativeAnimations {
       { transform: `translateX(${offset}) scale(${logoEntrance.startScale})` },
       { transform: 'translateX(0) scale(1)' },
     ], {
-      delay: isRight ? logoEntrance.rightDelay : logoEntrance.leftDelay,
+      delay: this.logoDelay,
       duration: logoEntrance.duration,
       easing: logoEntrance.easing,
+      fill: 'backwards',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
+  }
+
+  preparePanelEntrance() {
+    if (this.motionPreference.matches || !this.panel) return;
+
+    const finalOpacity = Number(getComputedStyle(this.panel).opacity);
+
+    const animation = this.panel.animate([
+      { opacity: 0 },
+      { opacity: finalOpacity },
+    ], {
+      delay: this.panelDelay,
+      duration: panelEntrance.duration,
+      easing: 'ease-out',
+      fill: 'backwards',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
+  }
+
+  prepareCopyEntrance() {
+    if (this.motionPreference.matches || !this.copy) return;
+
+    // Opacity comes from the panel wrapper, so its background and copy fade together.
+    const animation = this.copy.animate([
+      { transform: 'translateX(100%)' },
+      { transform: 'translateX(0)' },
+    ], {
+      delay: this.panelDelay + copyEntrance.delayAfterPanel,
+      duration: copyEntrance.duration,
+      easing: copyEntrance.easing,
       fill: 'backwards',
     });
 

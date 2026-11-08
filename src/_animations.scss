@@ -1,5 +1,5 @@
-// Temporarily hide the remaining foreground assets while planning their entrances.
-.creative .asset:not(.creative__headline, .creative__logo) {
+// Keep the CTA hidden until its entrance is added.
+.creative .creative__cta {
   visibility: hidden;
 }
 
