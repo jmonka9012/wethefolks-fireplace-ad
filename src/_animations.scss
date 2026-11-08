@@ -1,3 +1,8 @@
+// Temporarily hide the remaining foreground assets while planning their entrances.
+.creative .asset:not(.creative__headline) {
+  visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .creative {
     &,

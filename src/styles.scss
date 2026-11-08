@@ -68,6 +68,12 @@ body {
     transform-origin: center;
   }
 
+  &__headline {
+    position: absolute;
+    top: 0;
+    left: calc(0px - var(--background-x));
+  }
+
   &:focus-visible {
     outline: 3px solid white;
     outline-offset: -3px;

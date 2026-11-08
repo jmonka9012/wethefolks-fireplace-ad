@@ -1,3 +1,7 @@
+.creative .asset:not(.creative__headline) {
+  visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .creative,
   .creative * {
@@ -56,6 +60,11 @@ body {
   background-repeat: no-repeat;
   background-size: 1680px 975px;
   transform-origin: center;
+}
+.creative__headline {
+  position: absolute;
+  top: 0;
+  left: calc(0px - var(--background-x));
 }
 .creative:focus-visible {
   outline: 3px solid white;
