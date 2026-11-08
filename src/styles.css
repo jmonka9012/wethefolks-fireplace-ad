@@ -1,4 +1,4 @@
-.creative .asset:not(.creative__headline) {
+.creative .asset:not(.creative__headline, .creative__logo) {
   visibility: hidden;
 }
 
@@ -50,6 +50,9 @@ body {
 .creative--right {
   --background-x: -1356px;
 }
+.creative--right .creative__logo {
+  transform-origin: right 125.25px;
+}
 .creative__background {
   position: absolute;
   top: 0;
@@ -65,6 +68,9 @@ body {
   position: absolute;
   top: 0;
   left: calc(0px - var(--background-x));
+}
+.creative__logo {
+  transform-origin: left 125.25px;
 }
 .creative:focus-visible {
   outline: 3px solid white;

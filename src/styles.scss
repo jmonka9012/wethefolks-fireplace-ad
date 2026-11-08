@@ -53,6 +53,10 @@ body {
 
   &--right {
     --background-x: #{-($background-inset + $side-width + $top-width)};
+
+    .creative__logo {
+      transform-origin: right 125.25px;
+    }
   }
 
   &__background {
@@ -72,6 +76,11 @@ body {
     position: absolute;
     top: 0;
     left: calc(0px - var(--background-x));
+  }
+
+  &__logo {
+    // Scale around the visible logo's center, not the full transparent image canvas.
+    transform-origin: left 125.25px;
   }
 
   &:focus-visible {

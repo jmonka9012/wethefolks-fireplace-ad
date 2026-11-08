@@ -4,20 +4,30 @@ const backgroundZoom = {
   easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
+const logoEntrance = {
+  leftDelay: 1200,
+  rightDelay: 1500,
+  duration: 1000,
+  startScale: 0.5,
+  easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+};
+
 class CreativeAnimations {
   constructor(creative) {
     this.creative = creative;
     this.background = creative.querySelector('.creative__background');
+    this.logo = creative.querySelector('.creative__logo');
     this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     this.syncedPreview = window.parent !== window
       && new URLSearchParams(window.location.search).get('sync') === '1';
     this.ready = false;
-    this.zoomAnimation = null;
+    this.animations = [];
   }
 
   init() {
     this.updateMotionPreference();
     this.prepareBackgroundZoom();
+    this.prepareLogoEntrance();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -38,7 +48,7 @@ class CreativeAnimations {
   prepareBackgroundZoom() {
     if (this.motionPreference.matches) return;
 
-    this.zoomAnimation = this.background.animate([
+    const animation = this.background.animate([
       { transform: `scale(${backgroundZoom.startScale})` },
       { transform: 'scale(1)' },
     ], {
@@ -47,7 +57,28 @@ class CreativeAnimations {
       fill: 'backwards',
     });
 
-    this.zoomAnimation.pause();
+    animation.pause();
+    this.animations.push(animation);
+  }
+
+  prepareLogoEntrance() {
+    if (this.motionPreference.matches || !this.logo) return;
+
+    const isRight = this.creative.classList.contains('creative--right');
+    const offset = isRight ? '100%' : '-100%';
+
+    const animation = this.logo.animate([
+      { transform: `translateX(${offset}) scale(${logoEntrance.startScale})` },
+      { transform: 'translateX(0) scale(1)' },
+    ], {
+      delay: isRight ? logoEntrance.rightDelay : logoEntrance.leftDelay,
+      duration: logoEntrance.duration,
+      easing: logoEntrance.easing,
+      fill: 'backwards',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
   }
 
   markReady() {
@@ -77,11 +108,15 @@ class CreativeAnimations {
   }
 
   start(startAt = Date.now()) {
-    if (!this.ready || this.motionPreference.matches || !this.zoomAnimation) return;
+    if (!this.ready || this.motionPreference.matches) return;
 
-    this.zoomAnimation.play();
     // Translate the shared wall-clock time into this document's animation timeline.
-    this.zoomAnimation.startTime = startAt - performance.timeOrigin;
+    const startTime = startAt - performance.timeOrigin;
+
+    for (const animation of this.animations) {
+      animation.play();
+      animation.startTime = startTime;
+    }
   }
 
   updateMotionPreference() {

@@ -1,5 +1,5 @@
 // Temporarily hide the remaining foreground assets while planning their entrances.
-.creative .asset:not(.creative__headline) {
+.creative .asset:not(.creative__headline, .creative__logo) {
   visibility: hidden;
 }
 
