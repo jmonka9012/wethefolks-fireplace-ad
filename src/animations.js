@@ -36,10 +36,19 @@ const logoSway = {
   origin: '160.5px 125.25px',
 };
 
+const headlinePulse = {
+  scale: 1.08,
+  duration: 800,
+  interval: 6000,
+  delayAfterIntro: 2000,
+  stopAfter: 30000,
+};
+
 class CreativeAnimations {
   constructor(creative) {
     this.creative = creative;
     this.background = creative.querySelector('.creative__background');
+    this.headline = creative.querySelector('.creative__headline');
     this.logo = creative.querySelector('.creative__logo');
     this.panel = creative.querySelector('.creative__panel');
     this.copy = creative.querySelector('.creative__copy');
@@ -60,6 +69,7 @@ class CreativeAnimations {
     this.prepareCopyEntrance();
     this.prepareCtaEntrance();
     this.prepareLogoSway();
+    this.prepareHeadlinePulses();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -232,6 +242,29 @@ class CreativeAnimations {
 
     animation.pause();
     this.animations.push(animation);
+  }
+
+  prepareHeadlinePulses() {
+    if (this.reducedMotion || !this.headline) return;
+
+    for (
+      let delay = this.introDuration + headlinePulse.delayAfterIntro;
+      delay + headlinePulse.duration <= headlinePulse.stopAfter;
+      delay += headlinePulse.interval
+    ) {
+      const animation = this.headline.animate([
+        { transform: 'scale(1)', easing: 'ease-out' },
+        { transform: `scale(${headlinePulse.scale})`, offset: 0.45, easing: 'ease-out' },
+        { transform: 'scale(1)' },
+      ], {
+        delay,
+        duration: headlinePulse.duration,
+        fill: 'none',
+      });
+
+      animation.pause();
+      this.animations.push(animation);
+    }
   }
 
   markReady() {
