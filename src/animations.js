@@ -28,6 +28,10 @@ const ctaEntrance = {
   overshootScale: 1.4,
 };
 
+const ambientMotion = {
+  stopAfter: 30000,
+};
+
 const logoSway = {
   angle: 4,
   duration: 6000,
@@ -223,6 +227,10 @@ class CreativeAnimations {
 
     const isRight = this.creative.classList.contains('creative--right');
     const delay = this.introDuration + (isRight ? logoSway.rightDelay : 0);
+    const iterations = Math.floor((ambientMotion.stopAfter - delay) / logoSway.duration);
+
+    if (iterations <= 0) return;
+
     const angle = isRight ? -logoSway.angle : logoSway.angle;
     const keyframes = [
       { transform: 'rotate(0deg)', offset: 0 },
@@ -238,7 +246,7 @@ class CreativeAnimations {
     const animation = this.logo.animate(keyframes, {
       delay,
       duration: logoSway.duration,
-      iterations: Infinity,
+      iterations,
       // The center pivot applies only during sway, preserving the intro's edge pivot.
       fill: 'none',
     });
@@ -263,6 +271,11 @@ class CreativeAnimations {
   }
 
   preparePulses(element, config, offset = 0) {
+    const delay = this.introDuration + config.delayAfterIntro + offset;
+    const remainingTime = ambientMotion.stopAfter - delay;
+
+    if (remainingTime <= 0) return;
+
     const pulseEnd = config.duration / config.interval;
 
     const animation = element.animate([
@@ -272,9 +285,9 @@ class CreativeAnimations {
       // Hold the resting scale until the next pulse.
       { transform: 'scale(1)', offset: 1 },
     ], {
-      delay: this.introDuration + config.delayAfterIntro + offset,
+      delay,
       duration: config.interval,
-      iterations: Infinity,
+      iterations: remainingTime / config.interval,
       fill: 'none',
     });
 
