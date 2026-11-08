@@ -32,7 +32,6 @@ const logoSway = {
   angle: 4,
   duration: 6000,
   rightDelay: 1000,
-  stopAfter: 30000,
   origin: '160.5px 125.25px',
 };
 
@@ -41,7 +40,14 @@ const headlinePulse = {
   duration: 800,
   interval: 6000,
   delayAfterIntro: 2000,
-  stopAfter: 30000,
+};
+
+const ctaPulse = {
+  scale: 1.18,
+  duration: 900,
+  interval: 6000,
+  delayAfterIntro: 4000,
+  rightDelay: 1000,
 };
 
 class CreativeAnimations {
@@ -70,6 +76,7 @@ class CreativeAnimations {
     this.prepareCtaEntrance();
     this.prepareLogoSway();
     this.prepareHeadlinePulses();
+    this.prepareCtaPulses();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -216,10 +223,6 @@ class CreativeAnimations {
 
     const isRight = this.creative.classList.contains('creative--right');
     const delay = this.introDuration + (isRight ? logoSway.rightDelay : 0);
-    const iterations = Math.floor((logoSway.stopAfter - delay) / logoSway.duration);
-
-    if (iterations <= 0) return;
-
     const angle = isRight ? -logoSway.angle : logoSway.angle;
     const keyframes = [
       { transform: 'rotate(0deg)', offset: 0 },
@@ -235,7 +238,7 @@ class CreativeAnimations {
     const animation = this.logo.animate(keyframes, {
       delay,
       duration: logoSway.duration,
-      iterations,
+      iterations: Infinity,
       // The center pivot applies only during sway, preserving the intro's edge pivot.
       fill: 'none',
     });
@@ -247,24 +250,36 @@ class CreativeAnimations {
   prepareHeadlinePulses() {
     if (this.reducedMotion || !this.headline) return;
 
-    for (
-      let delay = this.introDuration + headlinePulse.delayAfterIntro;
-      delay + headlinePulse.duration <= headlinePulse.stopAfter;
-      delay += headlinePulse.interval
-    ) {
-      const animation = this.headline.animate([
-        { transform: 'scale(1)', easing: 'ease-out' },
-        { transform: `scale(${headlinePulse.scale})`, offset: 0.45, easing: 'ease-out' },
-        { transform: 'scale(1)' },
-      ], {
-        delay,
-        duration: headlinePulse.duration,
-        fill: 'none',
-      });
+    this.preparePulses(this.headline, headlinePulse);
+  }
 
-      animation.pause();
-      this.animations.push(animation);
-    }
+  prepareCtaPulses() {
+    if (this.reducedMotion || !this.cta) return;
+
+    const isRight = this.creative.classList.contains('creative--right');
+    const offset = isRight ? ctaPulse.rightDelay : 0;
+
+    this.preparePulses(this.cta, ctaPulse, offset);
+  }
+
+  preparePulses(element, config, offset = 0) {
+    const pulseEnd = config.duration / config.interval;
+
+    const animation = element.animate([
+      { transform: 'scale(1)', offset: 0, easing: 'ease-out' },
+      { transform: `scale(${config.scale})`, offset: pulseEnd * 0.45, easing: 'ease-out' },
+      { transform: 'scale(1)', offset: pulseEnd },
+      // Hold the resting scale until the next pulse.
+      { transform: 'scale(1)', offset: 1 },
+    ], {
+      delay: this.introDuration + config.delayAfterIntro + offset,
+      duration: config.interval,
+      iterations: Infinity,
+      fill: 'none',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
   }
 
   markReady() {
