@@ -23,6 +23,11 @@ const copyEntrance = {
   easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
+const ctaEntrance = {
+  duration: 900,
+  overshootScale: 1.4,
+};
+
 class CreativeAnimations {
   constructor(creative) {
     this.creative = creative;
@@ -30,6 +35,7 @@ class CreativeAnimations {
     this.logo = creative.querySelector('.creative__logo');
     this.panel = creative.querySelector('.creative__panel');
     this.copy = creative.querySelector('.creative__copy');
+    this.cta = creative.querySelector('.creative__cta');
     this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     this.syncedPreview = window.parent !== window
       && new URLSearchParams(window.location.search).get('sync') === '1';
@@ -43,6 +49,7 @@ class CreativeAnimations {
     this.prepareLogoEntrance();
     this.preparePanelEntrance();
     this.prepareCopyEntrance();
+    this.prepareCtaEntrance();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -70,6 +77,10 @@ class CreativeAnimations {
     const lastLogoStart = Math.max(logoEntrance.leftDelay, logoEntrance.rightDelay);
 
     return lastLogoStart + panelEntrance.delayAfterLogoStart;
+  }
+
+  get copyDelay() {
+    return this.panelDelay + copyEntrance.delayAfterPanel;
   }
 
   prepareBackgroundZoom() {
@@ -135,9 +146,26 @@ class CreativeAnimations {
       { transform: 'translateX(100%)' },
       { transform: 'translateX(0)' },
     ], {
-      delay: this.panelDelay + copyEntrance.delayAfterPanel,
+      delay: this.copyDelay,
       duration: copyEntrance.duration,
       easing: copyEntrance.easing,
+      fill: 'backwards',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
+  }
+
+  prepareCtaEntrance() {
+    if (this.motionPreference.matches || !this.cta) return;
+
+    const animation = this.cta.animate([
+      { transform: 'scale(0)', easing: 'ease-out' },
+      { transform: `scale(${ctaEntrance.overshootScale})`, offset: 0.65, easing: 'ease-out' },
+      { transform: 'scale(1)' },
+    ], {
+      delay: this.copyDelay + copyEntrance.duration,
+      duration: ctaEntrance.duration,
       fill: 'backwards',
     });
 
