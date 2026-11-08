@@ -28,6 +28,14 @@ const ctaEntrance = {
   overshootScale: 1.4,
 };
 
+const logoSway = {
+  angle: 4,
+  duration: 6000,
+  rightDelay: 1000,
+  stopAfter: 30000,
+  origin: '160.5px 125.25px',
+};
+
 class CreativeAnimations {
   constructor(creative) {
     this.creative = creative;
@@ -51,6 +59,7 @@ class CreativeAnimations {
     this.preparePanelEntrance();
     this.prepareCopyEntrance();
     this.prepareCtaEntrance();
+    this.prepareLogoSway();
 
     this.motionPreference.addEventListener('change', () => {
       this.updateMotionPreference();
@@ -91,6 +100,15 @@ class CreativeAnimations {
 
   get copyDelay() {
     return this.panelDelay + copyEntrance.delayAfterPanel;
+  }
+
+  get introDuration() {
+    return Math.max(
+      backgroundZoom.duration,
+      Math.max(logoEntrance.leftDelay, logoEntrance.rightDelay) + logoEntrance.duration,
+      this.panelDelay + panelEntrance.duration,
+      this.copyDelay + copyEntrance.duration + ctaEntrance.duration,
+    );
   }
 
   prepareBackgroundZoom() {
@@ -177,6 +195,39 @@ class CreativeAnimations {
       delay: this.copyDelay + copyEntrance.duration,
       duration: ctaEntrance.duration,
       fill: 'backwards',
+    });
+
+    animation.pause();
+    this.animations.push(animation);
+  }
+
+  prepareLogoSway() {
+    if (this.reducedMotion || !this.logo) return;
+
+    const isRight = this.creative.classList.contains('creative--right');
+    const delay = this.introDuration + (isRight ? logoSway.rightDelay : 0);
+    const iterations = Math.floor((logoSway.stopAfter - delay) / logoSway.duration);
+
+    if (iterations <= 0) return;
+
+    const angle = isRight ? -logoSway.angle : logoSway.angle;
+    const keyframes = [
+      { transform: 'rotate(0deg)', offset: 0 },
+      { transform: `rotate(${angle}deg)`, offset: 0.25 },
+      { transform: `rotate(${-angle}deg)`, offset: 0.75 },
+      { transform: 'rotate(0deg)', offset: 1 },
+    ].map((frame) => ({
+      ...frame,
+      transformOrigin: logoSway.origin,
+      easing: 'ease-in-out',
+    }));
+
+    const animation = this.logo.animate(keyframes, {
+      delay,
+      duration: logoSway.duration,
+      iterations,
+      // The center pivot applies only during sway, preserving the intro's edge pivot.
+      fill: 'none',
     });
 
     animation.pause();
