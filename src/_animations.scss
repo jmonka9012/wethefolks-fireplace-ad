@@ -1,9 +1,17 @@
+@mixin disable-motion {
+  &,
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.creative[data-reduced-motion='true'] {
+  @include disable-motion;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .creative {
-    &,
-    * {
-      animation: none !important;
-      transition: none !important;
-    }
+  .creative:not([data-reduced-motion='false']) {
+    @include disable-motion;
   }
 }

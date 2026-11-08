@@ -126,6 +126,13 @@ body {
     cursor: pointer;
   }
 
+  &__motion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
   &__viewport {
     overflow-x: auto;
     scrollbar-width: none;

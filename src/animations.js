@@ -37,8 +37,9 @@ class CreativeAnimations {
     this.copy = creative.querySelector('.creative__copy');
     this.cta = creative.querySelector('.creative__cta');
     this.motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.params = new URLSearchParams(window.location.search);
     this.syncedPreview = window.parent !== window
-      && new URLSearchParams(window.location.search).get('sync') === '1';
+      && this.params.get('sync') === '1';
     this.ready = false;
     this.animations = [];
   }
@@ -67,6 +68,15 @@ class CreativeAnimations {
     }
   }
 
+  get reducedMotion() {
+    // Only the managed preview can override the actual system preference.
+    if (this.syncedPreview && this.params.has('reduced-motion')) {
+      return this.params.get('reduced-motion') === '1';
+    }
+
+    return this.motionPreference.matches;
+  }
+
   get logoDelay() {
     return this.creative.classList.contains('creative--right')
       ? logoEntrance.rightDelay
@@ -84,7 +94,7 @@ class CreativeAnimations {
   }
 
   prepareBackgroundZoom() {
-    if (this.motionPreference.matches) return;
+    if (this.reducedMotion) return;
 
     const animation = this.background.animate([
       { transform: `scale(${backgroundZoom.startScale})` },
@@ -100,7 +110,7 @@ class CreativeAnimations {
   }
 
   prepareLogoEntrance() {
-    if (this.motionPreference.matches || !this.logo) return;
+    if (this.reducedMotion || !this.logo) return;
 
     const isRight = this.creative.classList.contains('creative--right');
     const offset = isRight ? '100%' : '-100%';
@@ -120,7 +130,7 @@ class CreativeAnimations {
   }
 
   preparePanelEntrance() {
-    if (this.motionPreference.matches || !this.panel) return;
+    if (this.reducedMotion || !this.panel) return;
 
     const finalOpacity = Number(getComputedStyle(this.panel).opacity);
 
@@ -139,7 +149,7 @@ class CreativeAnimations {
   }
 
   prepareCopyEntrance() {
-    if (this.motionPreference.matches || !this.copy) return;
+    if (this.reducedMotion || !this.copy) return;
 
     // Opacity comes from the panel wrapper, so its background and copy fade together.
     const animation = this.copy.animate([
@@ -157,7 +167,7 @@ class CreativeAnimations {
   }
 
   prepareCtaEntrance() {
-    if (this.motionPreference.matches || !this.cta) return;
+    if (this.reducedMotion || !this.cta) return;
 
     const animation = this.cta.animate([
       { transform: 'scale(0)', easing: 'ease-out' },
@@ -200,7 +210,7 @@ class CreativeAnimations {
   }
 
   start(startAt = Date.now()) {
-    if (!this.ready || this.motionPreference.matches) return;
+    if (!this.ready || this.reducedMotion) return;
 
     // Translate the shared wall-clock time into this document's animation timeline.
     const startTime = startAt - performance.timeOrigin;
@@ -212,7 +222,7 @@ class CreativeAnimations {
   }
 
   updateMotionPreference() {
-    const reducedMotion = this.motionPreference.matches;
+    const reducedMotion = this.reducedMotion;
 
     this.creative.dataset.reducedMotion = String(reducedMotion);
 
