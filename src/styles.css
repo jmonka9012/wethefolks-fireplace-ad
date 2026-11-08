@@ -73,6 +73,10 @@ body {
 }
 .preview__viewport {
   overflow-x: auto;
+  scrollbar-width: none;
+}
+.preview__viewport::-webkit-scrollbar {
+  display: none;
 }
 
 .fireplace {
