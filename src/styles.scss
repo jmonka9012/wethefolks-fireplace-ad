@@ -1,7 +1,13 @@
+@use 'sass:math';
+
 $side-width: 320px;
 $top-width: 1032px;
 $top-height: 250px;
 $side-height: 975px;
+$fireplace-width: $side-width * 2 + $top-width;
+$background-width: 1680px;
+// Keep the source at 50% scale and crop the extra 8px equally at the outer edges.
+$background-inset: math.div($background-width - $fireplace-width, 2);
 
 * {
   box-sizing: border-box;
@@ -28,6 +34,8 @@ body {
 }
 
 .creative {
+  --background-x: #{-$background-inset};
+
   position: relative;
   display: block;
   width: $side-width;
@@ -36,8 +44,23 @@ body {
   isolation: isolate;
 
   &--top {
+    --background-x: #{-($background-inset + $side-width)};
+
     width: $top-width;
     height: $top-height;
+  }
+
+  &--right {
+    --background-x: #{-($background-inset + $side-width + $top-width)};
+  }
+
+  &__background {
+    position: absolute;
+    inset: 0;
+    background-image: url('../assets/bg-big.jpg');
+    background-repeat: no-repeat;
+    background-size: $background-width $side-height;
+    background-position: var(--background-x) 0;
   }
 
   &:focus-visible {
@@ -97,7 +120,7 @@ body {
   display: grid;
   grid-template-columns: $side-width $top-width $side-width;
   grid-template-rows: $top-height ($side-height - $top-height);
-  width: $side-width * 2 + $top-width;
+  width: $fireplace-width;
   height: $side-height;
   margin-inline: auto;
 
