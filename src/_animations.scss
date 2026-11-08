@@ -1,0 +1,9 @@
+@media (prefers-reduced-motion: reduce) {
+  .creative {
+    &,
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
