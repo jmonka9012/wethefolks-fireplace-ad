@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.work/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.agents/
+.codex/
+.aws/
+/screen/
+/wethefolks_recruitment-sf-fe-01-bam.html
